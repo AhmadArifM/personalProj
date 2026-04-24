@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friendlier Intake Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F5F8FA;
+    color: #1A2332;
+    min-height: 100vh;
+  }
+  
+  .header {
+    background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+    padding: 16px 24px;
+    box-shadow: 0 2px 12px rgba(230, 126, 34, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 28px; }
+  .header-title { font-size: 18px; font-weight: 800; color: white; letter-spacing: -0.3px; }
+  .header-subtitle { 
+    font-size: 10px; color: rgba(255,255,255,0.9); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-top: 2px; font-weight: 600;
+  }
+  .stat-box {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 10px; text-align: center;
+  }
+  .stat-value { font-size: 28px; font-weight: 900; color: white; line-height: 1; }
+  .stat-label { font-size: 9px; color: rgba(255,255,255,0.85); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+  
+  .content { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    padding: 20px 24px 60px;
+  }
+  
+  .section-header {
+    font-size: 11px; color: #7B8794; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #E5E9ED;
+  }
+  
+  /* Input card */
+  .input-card {
+    background: white;
+    border: 2px solid #E5E9ED;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  
+  .operator-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #E67E22;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #F0F3F5;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .category-field {
+    background: #F8FAFB;
+    border: 2px solid #E5E9ED;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .category-label {
+    font-size: 10px;
+    color: #7B8794;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .category-label-desc {
+    font-size: 9px;
+    color: #A5B0BC;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .category-input {
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 2px solid #E5E9ED;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    font-family: inherit;
+    outline: none;
+  }
+  .category-input:focus { border-color: #E67E22; }
+  
+  .hours-field {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE8CC 100%);
+    border: 2px solid #E67E22;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .hours-label {
+    font-size: 11px;
+    color: #D35400;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hours-input {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 2px solid #E67E22;
+    border-radius: 8px;
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+    font-family: inherit;
+    outline: none;
+  }
+  .hours-input:focus { border-color: #D35400; }
+  
+  .cph-display {
+    background: linear-gradient(135deg, #E8F4FB 0%, #D4E9F7 100%);
+    border: 2px solid #4A9FD8;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .cph-label {
+    font-size: 11px;
+    color: #2E7FB8;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .cph-value {
+    font-size: 42px;
+    font-weight: 900;
+    color: #4A9FD8;
+    line-height: 1;
+  }
+  .cph-formula {
+    font-size: 11px;
+    color: #7B8794;
+    margin-top: 6px;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #27AE60 0%, #1E8449 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 10px rgba(39, 174, 96, 0.2);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(39, 174, 96, 0.3); }
+  .submit-btn:disabled { background: #E5E9ED; color: #A5B0BC; cursor: not-allowed; transform: none; box-shadow: none; }
+  
+  /* Log entries */
+  .log-entry {
+    background: white;
+    border: 2px solid #E5E9ED;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #F0F3F5;
+  }
+  .log-operator {
+    font-size: 14px;
+    font-weight: 800;
+    color: #E67E22;
+  }
+  .log-time {
+    font-size: 11px;
+    color: #A5B0BC;
+  }
+  .log-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .log-stat {
+    text-align: center;
+  }
+  .log-stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1A2332;
+  }
+  .log-stat-label {
+    font-size: 9px;
+    color: #7B8794;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .log-categories {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #F0F3F5;
+    font-size: 11px;
+    color: #7B8794;
+  }
+  
+  /* Summary */
+  .summary-card {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE8CC 100%);
+    border: 3px solid #E67E22;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.15);
+  }
+  .summary-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #D35400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(211, 84, 0, 0.1);
+  }
+  .summary-label {
+    font-size: 13px;
+    color: #7B8794;
+    font-weight: 600;
+  }
+  .summary-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: #E67E22;
+  }
+  .summary-grand {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 16px;
+    margin-top: 10px;
+    border-top: 2px solid #E67E22;
+  }
+  .summary-grand-label {
+    font-size: 14px;
+    color: #D35400;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .summary-grand-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #D35400;
+  }
+  
+  /* Action buttons */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .btn-action {
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-export { background: white; border: 2px solid #E67E22; color: #E67E22; }
+  .btn-export:hover { background: #FFF3E0; }
+  .btn-handover { 
+    background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); 
+    border: none; 
+    color: white; 
+    box-shadow: 0 3px 10px rgba(155, 89, 182, 0.2);
+    grid-column: span 2;
+  }
+  .btn-handover:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(155, 89, 182, 0.3); }
+  .btn-reset { background: white; border: 2px solid #F4C2C2; color: #E74C3C; }
+  .btn-reset:hover { background: #FEF5F5; }
+  .btn-switch { background: white; border: 2px solid #B8D4E8; color: #5A6775; }
+  .btn-switch:hover { background: #F8FAFB; }
+  
+  /* Login screen */
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #FFF3E0 0%, #F5F8FA 100%);
+  }
+  .login-logo { font-size: 72px; margin-bottom: 20px; }
+  .login-title { font-size: 32px; font-weight: 900; color: #1A2332; margin-bottom: 8px; }
+  .login-subtitle {
+    font-size: 12px;
+    color: #E67E22;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+    font-weight: 700;
+  }
+  .login-input {
+    max-width: 380px;
+    text-align: center;
+    margin-bottom: 24px;
+    width: 100%;
+    padding: 16px 20px;
+    background: white;
+    border: 2px solid #E5E9ED;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    font-weight: 600;
+  }
+  .login-input:focus { border-color: #E67E22; }
+  .login-btn {
+    padding: 16px 56px;
+    background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.35);
+  }
+  .login-btn:disabled { background: #E5E9ED; color: #A5B0BC; cursor: default; box-shadow: none; }
+  
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 35, 50, 0.8);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-logo">📦</div>
+  <div class="login-title">Intake Container Tracker</div>
+  <div class="login-subtitle">Friendlier Sorting Station</div>
+  <input id="operatorInput" class="login-input" placeholder="Enter your name..." autofocus>
+  <button id="startBtn" class="login-btn" disabled>START TRACKING →</button>
+  <div style="font-size: 11px; color: #A5B0BC; margin-top: 36px;">Built by Ahmad · Friendlier CI Tools</div>
+</div>
+
+<div id="mainApp" class="hidden">
+  <div class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">📦</div>
+        <div>
+          <div class="header-title">Intake Tracker</div>
+          <div class="header-subtitle">OPERATOR: <span id="headerOperator"></span></div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-label">SORTED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-header">Current Entry</div>
+    
+    <div class="input-card">
+      <div class="operator-name" id="currentOperator"></div>
+      
+      <div class="category-grid">
+        <div class="category-field">
+          <div class="category-label">
+            Category A/B
+            <div class="category-label-desc">Mouldy + Food</div>
+          </div>
+          <input type="number" id="catAB" class="category-input" placeholder="0" min="0">
+        </div>
+        
+        <div class="category-field">
+          <div class="category-label">
+            Category C
+            <div class="category-label-desc">Some Food</div>
+          </div>
+          <input type="number" id="catC" class="category-input" placeholder="0" min="0">
+        </div>
+        
+        <div class="category-field">
+          <div class="category-label">
+            Category D
+            <div class="category-label-desc">Stickers/Markers</div>
+          </div>
+          <input type="number" id="catD" class="category-input" placeholder="0" min="0">
+        </div>
+        
+        <div class="category-field">
+          <div class="category-label">
+            Category E
+            <div class="category-label-desc">Clean</div>
+          </div>
+          <input type="number" id="catE" class="category-input" placeholder="0" min="0">
+        </div>
+      </div>
+      
+      <div class="hours-field">
+        <div class="hours-label">Hours Worked</div>
+        <input type="number" id="hoursWorked" class="hours-input" placeholder="0" min="0" step="0.5">
+      </div>
+      
+      <div class="cph-display">
+        <div class="cph-label">Containers Per Hour</div>
+        <div class="cph-value" id="cphValue">0</div>
+        <div class="cph-formula" id="cphFormula">0 containers ÷ 0 hours</div>
+      </div>
+      
+      <button class="submit-btn" id="submitBtn" disabled>SUBMIT ENTRY</button>
+    </div>
+    
+    <div class="actions">
+      <button class="btn-action btn-export" id="exportBtn">
+        <span>📥</span> Export CSV
+      </button>
+      <button class="btn-action btn-reset" id="resetBtn">
+        <span>🗑️</span> Reset Day
+      </button>
+      <button class="btn-action btn-switch" id="switchOpBtn">
+        <span>👤</span> Switch Operator
+      </button>
+      <button class="btn-action btn-handover" id="handoverBtn">
+        <span>📊</span> GENERATE DAILY REPORT
+      </button>
+    </div>
+    
+    <div class="section-header">Daily Summary</div>
+    <div id="summaryBox" class="summary-card"></div>
+    
+    <div class="section-header">Today's Entries (<span id="entryCount">0</span>)</div>
+    <div id="logBox"></div>
+  </div>
+</div>
+
+<div id="handoverOverlay" class="overlay hidden">
+  <div class="modal">
+    <div style="font-size: 20px; font-weight: 800; color: #9B59B6; margin-bottom: 16px; text-align: center;">📊 Daily Intake Report</div>
+    <div id="handoverContent" style="font-size: 13px; color: #1A2332; line-height: 1.8; white-space: pre-wrap; font-family: 'DM Sans', monospace; background: #F8FAFB; padding: 20px; border-radius: 12px; max-height: 400px; overflow-y: auto; margin-bottom: 16px;"></div>
+    <div style="display: flex; gap: 10px;">
+      <button id="copyHandoverBtn" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;">📋 COPY TO CLIPBOARD</button>
+      <button id="closeHandoverBtn" style="flex: 1; padding: 14px; background: white; border: 2px solid #E5E9ED; border-radius: 10px; color: #7B8794; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = {
+  currentOperator: "",
+  entries: [],
+};
+
+const fmtTime = (d) => d.toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit" });
+const fmtDate = () => new Date().toLocaleDateString("en-CA", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+function calcCPH() {
+  const ab = parseInt(document.getElementById("catAB").value) || 0;
+  const c = parseInt(document.getElementById("catC").value) || 0;
+  const d = parseInt(document.getElementById("catD").value) || 0;
+  const e = parseInt(document.getElementById("catE").value) || 0;
+  const hours = parseFloat(document.getElementById("hoursWorked").value) || 0;
+  
+  const total = ab + c + d + e;
+  const cph = hours > 0 ? Math.round(total / hours) : 0;
+  
+  document.getElementById("cphValue").textContent = cph.toLocaleString();
+  document.getElementById("cphFormula").textContent = `${total} containers ÷ ${hours} hours`;
+  
+  const hasData = total > 0 && hours > 0;
+  document.getElementById("submitBtn").disabled = !hasData;
+}
+
+function submitEntry() {
+  const ab = parseInt(document.getElementById("catAB").value) || 0;
+  const c = parseInt(document.getElementById("catC").value) || 0;
+  const d = parseInt(document.getElementById("catD").value) || 0;
+  const e = parseInt(document.getElementById("catE").value) || 0;
+  const hours = parseFloat(document.getElementById("hoursWorked").value) || 0;
+  
+  const total = ab + c + d + e;
+  const cph = hours > 0 ? Math.round(total / hours) : 0;
+  
+  state.entries.push({
+    operator: state.currentOperator,
+    time: new Date(),
+    categories: { ab, c, d, e },
+    total,
+    hours,
+    cph
+  });
+  
+  // Clear inputs
+  document.getElementById("catAB").value = "";
+  document.getElementById("catC").value = "";
+  document.getElementById("catD").value = "";
+  document.getElementById("catE").value = "";
+  document.getElementById("hoursWorked").value = "";
+  
+  calcCPH();
+  render();
+}
+
+function render() {
+  document.getElementById("headerOperator").textContent = state.currentOperator;
+  document.getElementById("currentOperator").textContent = state.currentOperator;
+  
+  const grandTotal = state.entries.reduce((sum, e) => sum + e.total, 0);
+  const grandHours = state.entries.reduce((sum, e) => sum + e.hours, 0);
+  const grandCPH = grandHours > 0 ? Math.round(grandTotal / grandHours) : 0;
+  
+  document.getElementById("totalCount").textContent = grandTotal.toLocaleString();
+  document.getElementById("entryCount").textContent = state.entries.length;
+  
+  // Summary
+  const summaryBox = document.getElementById("summaryBox");
+  let html = `<div class="summary-title">📊 ${fmtDate()}</div>`;
+  
+  if (state.entries.length === 0) {
+    html += '<div style="color:#A5B0BC; text-align:center; padding:20px; font-size:14px;">No entries yet</div>';
+  } else {
+    html += `
+      <div class="summary-row">
+        <span class="summary-label">Total Operators</span>
+        <span class="summary-value">${new Set(state.entries.map(e => e.operator)).size}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Total Entries</span>
+        <span class="summary-value">${state.entries.length}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Total Containers</span>
+        <span class="summary-value">${grandTotal.toLocaleString()}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Total Hours</span>
+        <span class="summary-value">${grandHours.toFixed(1)}</span>
+      </div>
+      <div class="summary-grand">
+        <span class="summary-grand-label">Overall CPH</span>
+        <span class="summary-grand-value">${grandCPH.toLocaleString()}</span>
+      </div>
+    `;
+  }
+  summaryBox.innerHTML = html;
+  
+  // Log entries
+  const logBox = document.getElementById("logBox");
+  if (state.entries.length === 0) {
+    logBox.innerHTML = '<div style="color:#D1D9E0; font-size:14px; text-align:center; padding:40px;">No entries yet — start tracking!</div>';
+  } else {
+    logBox.innerHTML = state.entries.map(entry => `
+      <div class="log-entry">
+        <div class="log-header">
+          <div class="log-operator">${entry.operator}</div>
+          <div class="log-time">${fmtTime(entry.time)}</div>
+        </div>
+        <div class="log-stats">
+          <div class="log-stat">
+            <div class="log-stat-value">${entry.total}</div>
+            <div class="log-stat-label">Containers</div>
+          </div>
+          <div class="log-stat">
+            <div class="log-stat-value">${entry.hours}</div>
+            <div class="log-stat-label">Hours</div>
+          </div>
+          <div class="log-stat">
+            <div class="log-stat-value">${entry.cph}</div>
+            <div class="log-stat-label">CPH</div>
+          </div>
+        </div>
+        <div class="log-categories">
+          A/B: ${entry.categories.ab} · C: ${entry.categories.c} · D: ${entry.categories.d} · E: ${entry.categories.e}
+        </div>
+      </div>
+    `).reverse().join("");
+  }
+}
+
+function generateReport() {
+  const grandTotal = state.entries.reduce((sum, e) => sum + e.total, 0);
+  const grandHours = state.entries.reduce((sum, e) => sum + e.hours, 0);
+  const grandCPH = grandHours > 0 ? Math.round(grandTotal / grandHours) : 0;
+  
+  let report = `FRIENDLIER INTAKE CONTAINER REPORT
+${fmtDate()}
+
+DAILY SUMMARY:
+Total Containers Sorted: ${grandTotal.toLocaleString()}
+Total Hours: ${grandHours.toFixed(1)}
+Overall CPH: ${grandCPH.toLocaleString()}
+
+OPERATOR BREAKDOWN:
+`;
+
+  state.entries.forEach(entry => {
+    report += `
+${entry.operator} (${fmtTime(entry.time)}):
+  Containers: ${entry.total}
+  Hours: ${entry.hours}
+  CPH: ${entry.cph}
+  Categories - A/B: ${entry.categories.ab}, C: ${entry.categories.c}, D: ${entry.categories.d}, E: ${entry.categories.e}
+`;
+  });
+
+  document.getElementById("handoverContent").textContent = report;
+  document.getElementById("handoverOverlay").classList.remove("hidden");
+}
+
+// Login
+document.getElementById("operatorInput").addEventListener("input", (e) => {
+  document.getElementById("startBtn").disabled = !e.target.value.trim();
+});
+
+document.getElementById("operatorInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.value.trim()) {
+    state.currentOperator = e.target.value.trim();
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("mainApp").classList.remove("hidden");
+    render();
+  }
+});
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  const val = document.getElementById("operatorInput").value.trim();
+  if (val) {
+    state.currentOperator = val;
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("mainApp").classList.remove("hidden");
+    render();
+  }
+});
+
+// Auto-calculate CPH
+["catAB", "catC", "catD", "catE", "hoursWorked"].forEach(id => {
+  document.getElementById(id).addEventListener("input", calcCPH);
+});
+
+// Submit
+document.getElementById("submitBtn").addEventListener("click", submitEntry);
+
+// Switch operator
+document.getElementById("switchOpBtn").addEventListener("click", () => {
+  document.getElementById("mainApp").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("operatorInput").value = "";
+});
+
+// Export CSV
+document.getElementById("exportBtn").addEventListener("click", () => {
+  let csv = "Friendlier Intake Report," + fmtDate() + "\n\nOperator,Time,A/B,C,D,E,Total,Hours,CPH\n";
+  state.entries.forEach(e => {
+    csv += `${e.operator},${fmtTime(e.time)},${e.categories.ab},${e.categories.c},${e.categories.d},${e.categories.e},${e.total},${e.hours},${e.cph}\n`;
+  });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  a.download = "friendlier_intake_" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.click();
+});
+
+// Reset
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Reset all entries for today? This cannot be undone.")) return;
+  state.entries = [];
+  render();
+});
+
+// Report
+document.getElementById("handoverBtn").addEventListener("click", generateReport);
+document.getElementById("copyHandoverBtn").addEventListener("click", () => {
+  navigator.clipboard.writeText(document.getElementById("handoverContent").textContent);
+  document.getElementById("copyHandoverBtn").textContent = "✓ COPIED!";
+  setTimeout(() => { document.getElementById("copyHandoverBtn").innerHTML = "📋 COPY TO CLIPBOARD"; }, 2000);
+});
+document.getElementById("closeHandoverBtn").addEventListener("click", () => {
+  document.getElementById("handoverOverlay").classList.add("hidden");
+});
+</script>
+</body>
+</html>
